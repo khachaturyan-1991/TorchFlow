@@ -12,13 +12,13 @@ print("Device: ", device)
 BATCH_SIZE = 32
 IMG_SIZE = 128
 
-train_dataloader = create_dataloader(img_dir="../data/clothing/images",
+train_dataloader = create_dataloader(img_dir="../../data/clothing/images",
                                      target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                      first_img=0, last_img=32)
-test_dataloader = create_dataloader(img_dir="../data/clothing/images",
+test_dataloader = create_dataloader(img_dir="../../data/clothing/images",
                                     target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                     first_img=900, last_img=950)
-val_dataloader = create_dataloader(img_dir="../data/clothing/images",
+val_dataloader = create_dataloader(img_dir="../../data/clothing/images",
                                    target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                    first_img=0, last_img=32)
 
