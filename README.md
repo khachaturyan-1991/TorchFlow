@@ -13,4 +13,16 @@ root
     |--- data
             |---images
             |---masks
-            
+
+then go to the Weight_Tied_Autoencoders directory and type:
+python -m run.py
+you may use one of the follwoing optional flags
+    --framework help="Choose between tensorflow and torch"
+    --model help="Choose between Autoencoder and ZeroDecoder"
+    --device help="cpu, gpu, mpi"
+    --data_folder help="path/to/images"
+    --batch_size help="batch size"
+    --img_size help="image size"
+    --epochs help="number of epochs"
+    --output_freq help="output frequency"
+    --save_history help="name of the file to save history"
