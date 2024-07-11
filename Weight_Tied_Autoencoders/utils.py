@@ -69,9 +69,8 @@ def test_prediction(model,
     accuracy_loss = 0
     n = 0
     with tf.device(device):
-        for X, Y in dataloader:
+        for X, mask in dataloader:
             n += 1
-            mask = tf.where(Y > 1, tf.ones_like(Y), Y)
             Y_pred = model.predict(X)
             Y_pred = tf.squeeze(Y_pred, axis=-1)
             acumalative_loss += loss_fn(Y_pred, mask)

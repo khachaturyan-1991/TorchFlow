@@ -20,8 +20,7 @@ class Trainer():
                    dataloader: tf.data.Dataset):
         step_loss = 0
         n = 0
-        for X, Y in dataloader:
-            mask = tf.where(Y > 1, tf.ones_like(Y), Y)
+        for X, mask in dataloader:
             with tf.GradientTape() as tape:
                 pred = self.model(X, training=True)
                 loss = self.loss_fn(pred, mask)
@@ -36,8 +35,7 @@ class Trainer():
                   dataloader: tf.data.Dataset):
         step_loss = 0
         n = 0
-        for X, Y in dataloader:
-            mask = tf.where(Y > 1, tf.ones_like(Y), Y)
+        for X, mask in dataloader:
             pred = self.model(X, training=False)
             loss = self.loss_fn(pred, mask)
             step_loss += loss.numpy()

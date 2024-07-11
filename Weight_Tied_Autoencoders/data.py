@@ -15,12 +15,13 @@ class SmartDataset(tf.data.Dataset):
                 img_path = img_path.decode('utf-8')
             mask_path = re.sub(pattern, replacement, img_path)
             img = cv2.imread(img_path)
-            mask = cv2.imread(mask_path)
+            Y = cv2.imread(mask_path)
             img = smart_resize(img, target_size=target_size, channel=3)
-            mask = smart_resize(mask, target_size=target_size, channel=3)
+            Y = smart_resize(Y, target_size=target_size, channel=3)
             img = tf.cast(img, tf.float32) / 255.0
-            mask = tf.cast(mask, tf.float32)
-            yield img[:, :, 0:1], mask[:, :, 0:1]  # slicing is not a solution
+            Y = tf.cast(Y, tf.float32)
+            mask = tf.where(Y > 1, tf.ones_like(Y), Y)
+            yield img[:, :, 0:1], mask[:, :, 0:1]
 
     def __new__(cls,
                 img_dir: str,
