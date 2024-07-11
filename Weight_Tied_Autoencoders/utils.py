@@ -1,7 +1,6 @@
 import cv2
 import numpy as np
 import tensorflow as tf
-import tqdm
 import matplotlib.pylab as plt
 
 
@@ -38,71 +37,10 @@ def smart_resize(img: np.array,
     x_offset = (target_size - new_width) // 2
     y_offset = (target_size - new_height) // 2
 
-    tamplate[y_offset:y_offset+new_height,
-             x_offset:x_offset+new_width] = resized_image
+    tamplate[y_offset:y_offset + new_height,
+             x_offset:x_offset + new_width] = resized_image
 
     return tamplate
-
-
-def train_fn(model,
-             loss_fn,
-             train_dataloader,
-             val_dataloader,
-             optimizer,
-             first_step: int = 0,
-             last_step: int = 100,
-             output_freq: int = 2,
-             device: str = "cpu"):
-    """
-    Description
-    -------
-        Trained a model on a train data;
-
-    Parameteres
-    -------
-        model: a trained model
-        dataloader: a test dataloader
-        loss_fn: loss function
-        optimizer: optimization function
-        first_step: epoch from which training begins
-        epochs: number of epochs
-        output_freq: frequency of printing out training results
-        device: device on which to run calculations
-
-    Return
-    -------
-        average_loss - dictionary with average loss per epoch
-    """
-    avg_train_loss = {}
-    avg_val_loss = {}
-    with tf.device(device):
-        for epoch in tqdm.tqdm(range(first_step, last_step)):
-            train_loss = 0
-            val_loss = 0
-            n = 0
-            for X, Y in train_dataloader:
-                mask = tf.where(Y > 1, tf.ones_like(Y), Y)
-                with tf.GradientTape() as tape:
-                    Y_pred = model(X, training=True)
-                    loss = loss_fn(Y_pred, mask)
-                    train_loss += loss.numpy()
-                gradients = tape.gradient(loss, model.trainable_variables)
-                optimizer.apply_gradients(zip(gradients,
-                                              model.trainable_variables))
-                n += 1
-            avg_train_loss[epoch] = train_loss / n
-            n = 0
-            for X, Y in val_dataloader:
-                mask = tf.where(Y > 1, tf.ones_like(Y), Y)
-                Y_pred = model(X, training=False)
-                loss = loss_fn(Y_pred, mask)
-                val_loss += loss.numpy()
-                n += 1
-            avg_val_loss[epoch] = val_loss / n
-            if epoch % output_freq == 0:
-                print(f"Epoch {epoch + 1 + first_step}/{first_step + last_step}, \
-                      Train loss: {avg_train_loss[epoch]:.4f} Validation loss: {avg_val_loss[epoch]:.4f}")
-        return avg_train_loss, avg_val_loss
 
 
 def test_prediction(model,

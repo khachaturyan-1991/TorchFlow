@@ -3,9 +3,10 @@ import matplotlib.pylab as plt
 import time
 
 from args_parse import parse_arguments
-from autoencoder import Autoencoder, AutoencoderZeroDecoder
-from utils import train_fn, dice_loss
-from data import create_dataloader
+from tf.autoencoder import Autoencoder, AutoencoderZeroDecoder
+from utils import dice_loss
+from tf.data import create_dataloader
+from tf.train import Trainer
 
 
 if __name__ == "__main__":
@@ -49,15 +50,16 @@ if __name__ == "__main__":
     t1 = time.time()
 
     FIRST_STEP = 0
-    h_train, h_test = train_fn(model=model,
-                               train_dataloader=train_dataloader,
-                               val_dataloader=val_dataloader,
-                               loss_fn=dice_loss,
-                               optimizer=optim,
-                               first_step=FIRST_STEP,
-                               last_step=FIRST_STEP + EPOCHS,
-                               device=DEVICE,
-                               output_freq=OUTPUT_FREQUENCY)
+    model_train = Trainer(model=model,
+                          loss_fn=dice_loss,
+                          optimizer=optim,
+                          device=DEVICE)
+
+    h_train, h_test = model_train.fit(train_dataloder=train_dataloader,
+                                      test_dataloder=test_dataloader,
+                                      output_freq=OUTPUT_FREQUENCY,
+                                      epochs=EPOCHS,
+                                      first_step=FIRST_STEP)
 
     model.save(f'{MODEL_TYPE}.keras')
 
