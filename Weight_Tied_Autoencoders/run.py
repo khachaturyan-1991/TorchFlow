@@ -8,6 +8,7 @@ from tf.train import Trainer
 
 if __name__ == "__main__":
 
+    # Get parameters from a comand line
     args = parse_arguments()
     BATCH_SIZE = args.batch_size
     IMG_SIZE = args.img_size
@@ -18,8 +19,7 @@ if __name__ == "__main__":
     MODEL_TYPE = args.model.lower()
     DATA_FOLDER = args.data_folder
 
-    models_list = ["autoencoder", "zero_decoder"]
-
+    # Get data from the DATA_FOLDER
     train_dataloader = create_dataloader(img_dir=f"{DATA_FOLDER}",
                                          target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                          first_img=0, last_img=32)
@@ -30,24 +30,28 @@ if __name__ == "__main__":
                                        target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                        first_img=0, last_img=32)
 
+    # MODEL_TYPE is limited by a models_list
+    models_list = ["autoencoder", "zero_decoder"]
     assert MODEL_TYPE in models_list, "Model type mast be either autoencoder or zero_decoder"
     if MODEL_TYPE == "zero_decoder":
         model = AutoencoderZeroDecoder()
     else:
         model = Autoencoder()
 
+    # Instantiate the model
     input_tensor = tf.random.normal([1, IMG_SIZE, IMG_SIZE, 1])
-    output_tensor = model(input_tensor)
+    _ = model(input_tensor)
     print(model.summary())
 
+    # Instantiate optimizer and traning
     optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
-
     FIRST_STEP = 0
     model_train = Trainer(model=model,
                           loss_fn=dice_loss,
                           optimizer=optim,
                           device=DEVICE)
 
+    # Run traning
     h_train, h_test = model_train.fit(train_dataloder=train_dataloader,
                                       test_dataloder=test_dataloader,
                                       output_freq=OUTPUT_FREQUENCY,
@@ -56,6 +60,7 @@ if __name__ == "__main__":
 
     model.save(f'{MODEL_TYPE}.keras')
 
+    # Plot loss history
     if SAVE_HISTORY:
         plot_hystory(h_train,
                      h_test,
