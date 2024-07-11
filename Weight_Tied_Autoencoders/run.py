@@ -1,7 +1,6 @@
 import tensorflow as tf
-from args_parse import parse_arguments
 from tf.autoencoder import Autoencoder, AutoencoderZeroDecoder
-from utils import dice_loss, plot_hystory
+from utils import dice_loss, plot_hystory, parse_arguments
 from tf.data import create_dataloader
 from tf.train import Trainer
 
