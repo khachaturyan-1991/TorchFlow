@@ -38,8 +38,6 @@ if __name__ == "__main__":
 
     input_tensor = tf.random.normal([1, IMG_SIZE, IMG_SIZE, 1])
     output_tensor = model(input_tensor)
-    print("Input tensor shape: ", input_tensor.shape)
-    print("Output tensor shape: ", output_tensor.shape)
     print(model.summary())
 
     optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
