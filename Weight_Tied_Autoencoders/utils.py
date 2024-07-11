@@ -89,21 +89,6 @@ def test_prediction(model,
     plt.show()
 
 
-def dice_loss(y_true, y_pred, epsilon=1e-6):
-    """Dice loss"""
-    y_true = tf.cast(y_true, tf.float32)
-    y_pred = tf.cast(y_pred, tf.float32)
-    intersection = tf.reduce_sum(y_true * y_pred, axis=[1, 2])
-    union = tf.reduce_sum(
-        y_true, axis=[1, 2]) + tf.reduce_sum(
-            y_pred, axis=[1, 2])
-
-    dice = (2. * intersection + epsilon) / (union + epsilon)
-    dice_loss = 1 - dice
-
-    return tf.reduce_mean(dice_loss)
-
-
 def plot_hystory(h_train: dict,
                  h_test: dict,
                  file_name: str = "history"):
@@ -128,6 +113,7 @@ def plot_hystory(h_train: dict,
 
 def parse_arguments():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--framework", type=str, default="tensorflow", help="Choose between tensorflow and torch")
     parser.add_argument("--model", type=str, default="Autoencoder", help="Choose between Autoencoder and ZeroDecoder")
     parser.add_argument("--device", type=str, default="cpu", help="cpu, gpu, mpi")
     parser.add_argument("--data_folder", type=str, default="../data/clothing/images")
