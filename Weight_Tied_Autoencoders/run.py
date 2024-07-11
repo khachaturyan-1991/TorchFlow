@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # Get data from the DATA_FOLDER
     train_dataloader = create_dataloader(img_dir=f"{DATA_FOLDER}",
                                          target_size=IMG_SIZE, batch_size=BATCH_SIZE,
-                                         first_img=0, last_img=32)
+                                         first_img=0, last_img=900)
     test_dataloader = create_dataloader(img_dir=f"{DATA_FOLDER}",
                                         target_size=IMG_SIZE, batch_size=BATCH_SIZE,
                                         first_img=900, last_img=950)
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     if FRAME == "tensorflow":
         model.save(f'{MODEL_TYPE}.keras')
     else:
-        torch.save(model.state_dict(), f'{MODEL_TYPE}.keras')
+        torch.save(model.state_dict(), f'{MODEL_TYPE}.pth')
 
     # Plot loss history
     if SAVE_HISTORY:

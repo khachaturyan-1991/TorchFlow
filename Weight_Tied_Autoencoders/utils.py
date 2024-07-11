@@ -115,7 +115,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--framework", type=str, default="tensorflow", help="Choose between tensorflow and torch")
     parser.add_argument("--model", type=str, default="Autoencoder", help="Choose between Autoencoder and ZeroDecoder")
-    parser.add_argument("--device", type=str, default="cpu", help="cpu, gpu, mpi")
+    parser.add_argument("--device", type=str, default="cpu", help="cpu, gpu, mps")
     parser.add_argument("--data_folder", type=str, default="../data/clothing/images")
     parser.add_argument("--batch_size", type=int, default=32, help="batch size")
     parser.add_argument("--img_size", type=int, default=128, help="image size")
