@@ -83,7 +83,7 @@ def UpperBlockCustom(ConvTranspose, filter_in):
                 x = self.convT(x)
             s = x.shape[1:3]
             x = tf.image.resize(x,
-                                [s[0]*2, s[1]*2],
+                                [s[0] * 2, s[1] * 2],
                                 method="bilinear")
             return x
 
@@ -92,14 +92,14 @@ def UpperBlockCustom(ConvTranspose, filter_in):
 
 class Autoencoder(keras.models.Model):
 
-    def __init__(self, channels: int = 1, **kwargs):
+    def __init__(self, **kwargs):
         super(Autoencoder, self).__init__(**kwargs)
         self.down_l1 = DownBlock(filter_in=64)
         self.down_l2 = DownBlock(filter_in=128)
         self.down_l3 = DownBlock(filter_in=256)
         self.up_l3 = UpperBlockCustom(keras.layers.Conv2DTranspose, 128)
         self.up_l2 = UpperBlockCustom(keras.layers.Conv2DTranspose, 64)
-        self.up_l1 = UpperBlockCustom(keras.layers.Conv2DTranspose, channels)
+        self.up_l1 = UpperBlockCustom(keras.layers.Conv2DTranspose, 1)
 
     def call(self, x):
         x = self.down_l1(x)
@@ -115,23 +115,23 @@ class Autoencoder(keras.models.Model):
 
 class AutoencoderZeroDecoder(keras.models.Model):
 
-    def __init__(self, channels: int = 1, **kwargs):
+    def __init__(self, **kwargs):
         super(AutoencoderZeroDecoder, self).__init__(**kwargs)
         self.down_l1 = DownBlock(filter_in=64)
         self.down_l2 = DownBlock(filter_in=128)
         self.down_l3 = DownBlock(filter_in=256)
         self.up_l3 = UpperBlockCustom(CustomConvTranspose2d, 128)
         self.up_l2 = UpperBlockCustom(CustomConvTranspose2d, 64)
-        self.up_l1 = UpperBlockCustom(CustomConvTranspose2d, channels)
+        self.up_l1 = UpperBlockCustom(CustomConvTranspose2d, 1)
 
     def call(self, x):
         x = self.down_l1(x)
         x = self.down_l2(x)
         x = self.down_l3(x)
 
-        w1 = self.down_l1.weights[0]
-        w2 = self.down_l2.weights[0]
-        w3 = self.down_l3.weights[0]
+        w1 = self.down_l1.weights
+        w2 = self.down_l2.weights
+        w3 = self.down_l3.weights
 
         x = self.up_l3(x, w3)
         x = self.up_l2(x, w2)
