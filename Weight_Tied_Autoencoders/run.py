@@ -1,10 +1,7 @@
 import tensorflow as tf
-import matplotlib.pylab as plt
-import time
-
 from args_parse import parse_arguments
 from tf.autoencoder import Autoencoder, AutoencoderZeroDecoder
-from utils import dice_loss
+from utils import dice_loss, plot_hystory
 from tf.data import create_dataloader
 from tf.train import Trainer
 
@@ -47,8 +44,6 @@ if __name__ == "__main__":
 
     optim = tf.keras.optimizers.Adam(learning_rate=1e-4)
 
-    t1 = time.time()
-
     FIRST_STEP = 0
     model_train = Trainer(model=model,
                           loss_fn=dice_loss,
@@ -63,25 +58,7 @@ if __name__ == "__main__":
 
     model.save(f'{MODEL_TYPE}.keras')
 
-    t2 = time.time()
-    print("Time Spent: ", (t2 - t1) // 60)
-
     if SAVE_HISTORY:
-
-        fig = plt.figure(figsize=(6, 6))
-
-        plt.plot(h_train.keys(),
-                 h_train.values(),
-                 "-o", label="Train")
-
-        plt.plot(h_test.keys(),
-                 h_test.values(),
-                 "-*", label="Validation")
-
-        plt.legend(title="Dataset")
-
-        plt.grid(True)
-        plt.xlabel("epoch")
-        plt.ylabel("Loss")
-        plt.ylim(0, 1)
-        plt.savefig(f"{SAVE_HISTORY}.png")
+        plot_hystory(h_train,
+                     h_test,
+                     SAVE_HISTORY)

@@ -102,3 +102,25 @@ def dice_loss(y_true, y_pred, epsilon=1e-6):
     dice_loss = 1 - dice
 
     return tf.reduce_mean(dice_loss)
+
+
+def plot_hystory(h_train: dict,
+                 h_test: dict,
+                 file_name: str = "history"):
+    _ = plt.figure(figsize=(6, 6))
+
+    plt.plot(h_train.keys(),
+             h_train.values(),
+             "-o", label="Train")
+
+    plt.plot(h_test.keys(),
+             h_test.values(),
+             "-*", label="Validation")
+
+    plt.legend(title="Dataset")
+
+    plt.grid(True)
+    plt.xlabel("epoch")
+    plt.ylabel("Loss")
+    plt.ylim(0, 1)
+    plt.savefig(f"{file_name}.png")
