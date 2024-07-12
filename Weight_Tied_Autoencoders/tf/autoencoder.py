@@ -129,9 +129,9 @@ class AutoencoderZeroDecoder(keras.models.Model):
         x = self.down_l2(x)
         x = self.down_l3(x)
 
-        w1 = self.down_l1.weights
-        w2 = self.down_l2.weights
-        w3 = self.down_l3.weights
+        w1 = self.down_l1.weights[0]
+        w2 = self.down_l2.weights[0]
+        w3 = self.down_l3.weights[0]
 
         x = self.up_l3(x, w3)
         x = self.up_l2(x, w2)
