@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import tqdm
+import matplotlib.pylab as plt
 
 
 class Trainer():
@@ -64,5 +65,31 @@ class Trainer():
         return avg_train_loss, avg_val_loss
 
 
-if __name__ == "__main__":
-    pass
+def test_prediction(model,
+                    dataloader,
+                    loss_fn,
+                    image_name: str = "test_prediction"):
+    loss = 0
+    n = 0
+    with tf.device("cpu"):
+        for X, masks in dataloader:
+            Y_pred = model.predict(X)
+            loss += loss_fn(Y_pred, masks)
+            n += 1
+
+    print("Loss per test: ", loss / n)
+
+    Y_pred = tf.squeeze(Y_pred, axis=-1)
+    masks = masks.numpy()
+    _, axes = plt.subplots(2, 4, figsize=(8, 5))
+    axes = axes.ravel()
+    for i in range(4):
+        axes[i].imshow(Y_pred[i][0])
+        axes[i].axis("off")
+        y = masks[i]
+        y[y > 1] = 1
+        axes[i + 4].imshow(y[0])
+        axes[i + 4].axis("off")
+
+    plt.tight_layout()
+    plt.savefig(f"{image_name}.png")

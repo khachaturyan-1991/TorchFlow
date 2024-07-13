@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-import tensorflow as tf
 import matplotlib.pylab as plt
 import argparse
 
@@ -44,51 +43,6 @@ def smart_resize(img: np.array,
     return tamplate
 
 
-def test_prediction(model,
-                    dataloader,
-                    loss_fn,
-                    accuracy_fn,
-                    device: str = "cpu"):
-    """
-    Description
-    -------
-        Takes a trained model and test data to astimate loss
-        and plot examples of Predictins and Masks
-
-    Parameteres
-    -------
-        model: a trained model
-        dataloader: a test dataloader
-        loss_fn: loss function
-        device: device on which to run calculations
-
-    Return
-    -------
-        None
-    """
-    acumalative_loss = 0
-    accuracy_loss = 0
-    n = 0
-    with tf.device(device):
-        for X, mask in dataloader:
-            n += 1
-            Y_pred = model.predict(X)
-            Y_pred = tf.squeeze(Y_pred, axis=-1)
-            acumalative_loss += loss_fn(Y_pred, mask)
-            accuracy_loss += accuracy_fn(Y_pred, mask)
-    print("Average error on test data: ", acumalative_loss / n)
-    print("Average accuracy on test data: ", accuracy_loss / n)
-
-    _, axes = plt.subplots(2, 2, figsize=(10, 10))
-    axes = axes.ravel()
-    axes[0].imshow(Y_pred[0])
-    axes[1].imshow(mask[0])
-    axes[2].imshow(Y_pred[1])
-    axes[3].imshow(mask[1])
-    plt.tight_layout()
-    plt.show()
-
-
 def plot_hystory(h_train: dict,
                  h_test: dict,
                  file_name: str = "history"):
@@ -114,7 +68,7 @@ def plot_hystory(h_train: dict,
 def parse_arguments():
     parser = argparse.ArgumentParser()
     parser.add_argument("--framework", type=str, default="tensorflow", help="Choose between tensorflow and torch")
-    parser.add_argument("--model", type=str, default="Autoencoder", help="Choose between Autoencoder and ZeroDecoder")
+    parser.add_argument("--model", type=str, default="autoencoder", help="Choose between autoencoder, autoencoder_wt, unet, unet_wt")
     parser.add_argument("--device", type=str, default="cpu", help="cpu, gpu, mps")
     parser.add_argument("--data_folder", type=str, default="../data/clothing/images")
     parser.add_argument("--batch_size", type=int, default=32, help="batch size")
@@ -124,3 +78,24 @@ def parse_arguments():
     parser.add_argument("--save_history", type=str, default=None, help="name of the file to save history")
     args = parser.parse_args()
     return args
+
+
+def count_torch_parameters(model):
+    trainable_params = 0
+    non_trainable_params = 0
+    trainable_weights = 0
+    non_trainable_weights = 0
+
+    for param in model.parameters():
+        param_count = param.numel()
+        if param.requires_grad:
+            trainable_params += param_count
+            trainable_weights += param_count * param.element_size()
+        else:
+            non_trainable_params += param_count
+            non_trainable_weights += param_count * param.element_size()
+
+    print(f"Trainable parameters: {trainable_params}")
+    print(f"Non-trainable parameters: {non_trainable_params}")
+    print(f"Trainable weights (Mb): {trainable_weights / 1e6}")
+    print(f"Non-trainable weights (Mb): {non_trainable_weights / 1e6}")

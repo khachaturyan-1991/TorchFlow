@@ -1,6 +1,6 @@
 import tensorflow
 import torch
-from utils import plot_hystory, parse_arguments
+from utils import plot_hystory, parse_arguments, count_torch_parameters
 
 
 if __name__ == "__main__":
@@ -21,13 +21,15 @@ if __name__ == "__main__":
     assert FRAME in frams_list, "Framework must be either tensorflow or torch"
     if FRAME == "tensorflow":
         from tf.autoencoder import Autoencoder, AutoencoderZeroDecoder
+        from tf.unet import UNet, UNetZeroDecoder
         from tf.data import create_dataloader
-        from tf.train import Trainer
+        from tf.train import Trainer, test_prediction
         from tf.losses import dice_loss
     else:
         from tr.autoencoder import Autoencoder, AutoencoderZeroDecoder
+        from tr.unet import UNet, UNetZeroDecoder
         from tr.data import create_dataloader
-        from tr.train import Trainer
+        from tr.train import Trainer, test_prediction
         from tr.losses import dice_loss
 
     # Get data from the DATA_FOLDER
@@ -39,15 +41,19 @@ if __name__ == "__main__":
                                         first_img=900, last_img=950)
     val_dataloader = create_dataloader(img_dir=f"{DATA_FOLDER}",
                                        target_size=IMG_SIZE, batch_size=BATCH_SIZE,
-                                       first_img=0, last_img=32)
+                                       first_img=950, last_img=1000)
 
     # MODEL_TYPE is limited by a models_list
-    models_list = ["autoencoder", "zero_decoder"]
+    models_list = ["autoencoder", "autoencoder_wt", "unet", "unet_wt"]
     assert MODEL_TYPE in models_list, "Model type mast be either autoencoder or zero_decoder"
-    if MODEL_TYPE == "zero_decoder":
-        model = AutoencoderZeroDecoder()
-    else:
+    if MODEL_TYPE == "autoencoder":
         model = Autoencoder()
+    elif MODEL_TYPE == "autoencoder_wt":
+        model = AutoencoderZeroDecoder()
+    elif MODEL_TYPE == "unet":
+        model = UNet()
+    else:
+        model = UNetZeroDecoder()
 
     # Instantiate model and optimizer
     if FRAME == "tensorflow":
@@ -61,6 +67,7 @@ if __name__ == "__main__":
             print(f"{name}: {param.size()}")
         optim = torch.optim.Adam(params=model.parameters(),
                                  lr=1e-4)
+        count_torch_parameters(model)
 
     # Instantiate and traning
     FIRST_STEP = 0
@@ -86,3 +93,5 @@ if __name__ == "__main__":
         plot_hystory(h_train,
                      h_test,
                      SAVE_HISTORY)
+
+    test_prediction(model, test_dataloader, dice_loss, MODEL_TYPE)

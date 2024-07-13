@@ -17,4 +17,3 @@ def dice_loss(y_true, y_pred, epsilon=1e-6):
     dice_loss = 1 - dice
 
     return torch.mean(dice_loss)
-

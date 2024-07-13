@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 import tqdm
+import matplotlib.pylab as plt
 
 
 class Trainer:
@@ -67,3 +68,34 @@ class Trainer:
                 print(f"Epoch {epoch + 1 + first_step}/{first_step + last_step}, \
                     Train loss: {train_loss:.4f} Validation loss: {test_loss:.4f}")
         return avg_train_loss, avg_val_loss
+
+
+def test_prediction(model,
+                    dataloader,
+                    loss_fn,
+                    image_name: str = "test_prediction"):
+    model.to("cpu")
+    loss = 0
+    n = 0
+    for X, masks in dataloader:
+        Y_pred = model(X)
+        loss += loss_fn(Y_pred, masks).item()
+        n += 1
+
+    print("Loss per test: ", loss / n)
+
+    Y_pred = torch.squeeze(Y_pred, dim=-1)
+    Y_pred = Y_pred.detach().numpy()
+    masks = masks.numpy()
+    _, axes = plt.subplots(2, 4, figsize=(8, 5))
+    axes = axes.ravel()
+    for i in range(4):
+        axes[i].imshow(Y_pred[i][0])
+        axes[i].axis("off")
+        y = masks[i]
+        y[y > 1] = 1
+        axes[i + 4].imshow(y[0])
+        axes[i + 4].axis("off")
+
+    plt.tight_layout()
+    plt.savefig(f"{image_name}.png")
