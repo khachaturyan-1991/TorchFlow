@@ -1,6 +1,7 @@
 import tensorflow
 import torch
 from utils import plot_hystory, parse_arguments, count_torch_parameters
+import pandas as pd
 
 
 if __name__ == "__main__":
@@ -95,3 +96,6 @@ if __name__ == "__main__":
                      SAVE_HISTORY)
 
     test_prediction(model, test_dataloader, dice_loss, MODEL_TYPE)
+
+    df = pd.DataFrame({'step': list(h_train.keys()), 'train_loss': list(h_train.values()), 'test_loss': list(h_test.values())})
+    df.to_csv(f'{MODEL_TYPE}_{FRAME}_{DEVICE}.csv', index=False)

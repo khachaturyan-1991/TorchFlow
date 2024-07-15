@@ -97,7 +97,7 @@ class UNet(keras.models.Model):
         self.down_l1 = DownBlock(filter_in=64)
         self.down_l2 = DownBlock(filter_in=128)
         self.down_l3 = DownBlock(filter_in=256)
-        self.up_l3 = UpperBlockCustom(keras.layers.Conv2DTranspose, 128)
+        self.up_l3 = UpperBlockCustom(keras.layers.Conv2DTranspose,128)
         self.up_l2 = UpperBlockCustom(keras.layers.Conv2DTranspose, 64)
         self.up_l1 = UpperBlockCustom(keras.layers.Conv2DTranspose, 1)
         self.concat = keras.layers.Concatenate()

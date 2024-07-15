@@ -74,7 +74,7 @@ def test_prediction(model,
     with tf.device("cpu"):
         for X, masks in dataloader:
             Y_pred = model.predict(X)
-            loss += loss_fn(Y_pred, masks)
+            loss += loss_fn(Y_pred, masks).numpy()
             n += 1
 
     print("Loss per test: ", loss / n)
@@ -84,11 +84,11 @@ def test_prediction(model,
     _, axes = plt.subplots(2, 4, figsize=(8, 5))
     axes = axes.ravel()
     for i in range(4):
-        axes[i].imshow(Y_pred[i][0])
+        axes[i].imshow(Y_pred[i][:, :, 0])
         axes[i].axis("off")
-        y = masks[i]
+        y = masks[i][:, :, 0]
         y[y > 1] = 1
-        axes[i + 4].imshow(y[0])
+        axes[i + 4].imshow(y)
         axes[i + 4].axis("off")
 
     plt.tight_layout()
