@@ -126,29 +126,21 @@ class UNetZeroDecoder(nn.Module):
                                  out_channels=128)
         self.down_l3 = DownBlock(in_channels=128,
                                  out_channels=256)
-        self.down_l4 = DownBlock(in_channels=256,
-                                 out_channels=512)
-        self.up_l4 = UpperBlockCustom(CustomConvTranspose2d, 512, 512)
-        self.up_l3 = UpperBlockCustom(CustomConvTranspose2d, 2 * 256, 128)
+        self.up_l3 = UpperBlockCustom(CustomConvTranspose2d, 256, 128)
         self.up_l2 = UpperBlockCustom(CustomConvTranspose2d, 2 * 128, 64)
         self.up_l1 = UpperBlockCustom(CustomConvTranspose2d, 2 * 64, 1)
 
     def forward(self, x):
         x1 = self.down_l1(x)
         x2 = self.down_l2(x1)
-        x3 = self.down_l3(x2)
-        x = self.down_l4(x3)
+        x = self.down_l3(x2)
 
         w1 = self.down_l1.conv_1.weight.data
         w2 = self.down_l2.conv_1.weight.data
         w3 = self.down_l3.conv_1.weight.data
-        w4 = self.down_l4.conv_1.weight.data
         w1 = torch.cat([w1, w1], dim=0)
         w2 = torch.cat([w2, w2], dim=0)
-        w3 = torch.cat([w3, w3], dim=0)
 
-        x = self.up_l4(x, w4)
-        x = torch.cat([x, x3], dim=1)
         x = self.up_l3(x, w3)
         x = torch.cat([x, x2], dim=1)
         x = self.up_l2(x, w2)
